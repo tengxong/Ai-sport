@@ -58,7 +58,7 @@ class ProductReview:
 # ==========================
 
 # อ่านจาก environment (สำหรับ deploy) หรือใช้ค่าตั้งต้น
-DB_NAME = os.environ.get("DB_NAME", "postgres")
+DB_NAME = os.environ.get("DB_NAME", "aiSport")
 DB_USER = os.environ.get("DB_USER", "postgres")
 DB_PASSWORD = os.environ.get("DB_PASSWORD", "12345")
 DB_HOST = os.environ.get("DB_HOST", "localhost")
