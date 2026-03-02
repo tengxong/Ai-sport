@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ເຂົ້າສູ່ລະບົບ / ສມັກສະມາຊິກ | CHAMPA BRAND</title>
+  <title>ເຂົ້າສູ່ລະບົບ / ສມັກສະມາຊິກ | AI SPORT</title>
   <link rel="stylesheet" href="/brand/style.css" />
   <style>
     .auth-page { min-height: 100vh; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
@@ -41,7 +41,7 @@
   <div class="auth-page">
     <div class="auth-box">
       <div class="auth-header">
-        <h1>CHAMPA BRAND</h1>
+        <h1>AI SPORT</h1>
         <p id="auth-subtitle">ເຂົ້າສູ່ລະບົບ ຫຼື ສມັກສະມາຊິກ</p>
       </div>
       <div class="auth-tabs" id="auth-tabs">
@@ -154,9 +154,9 @@
               if (isAdmin) {
                 // บันทึก token ลง localStorage ก่อน redirect
                 localStorage.setItem("token", data.token);  // ฝั่ง Admin ใช้ key นี้
-                // ไม่เขียน champa_token เพื่อให้แท็บ client ยังใช้ลูกค้าคนเดิมได้
+                // ไม่เขียน ai_sport_token เพื่อให้แท็บ client ยังใช้ลูกค้าคนเดิมได้
               } else {
-                localStorage.setItem("champa_token", data.token);  // ฝั่ง Client ใช้ key นี้
+                localStorage.setItem("ai_sport_token", data.token);  // ฝั่ง Client ใช้ key นี้
                 // ไม่เขียน token เพื่อให้แท็บ Admin ยังใช้แอดมินคนเดิมได้
               }
             } catch (e) {

@@ -17,14 +17,14 @@ git config --global user.email "your.email@example.com"
 
 1. ไปที่ https://github.com
 2. คลิก **"New"** หรือ **"+"** → **"New repository"**
-3. ตั้งชื่อ repository เช่น `champa-brand-website`
+3. ตั้งชื่อ repository เช่น `ai-sport-website`
 4. เลือก **Public** หรือ **Private**
 5. **อย่า** check "Initialize with README" (เพราะเรามีไฟล์อยู่แล้ว)
 6. คลิก **"Create repository"**
 
 ## ขั้นตอนที่ 4: Initialize Git และ Push
 
-เปิด PowerShell ในโฟลเดอร์โปรเจกต์ (`d:\teng\website champa`) แล้วรันคำสั่ง:
+เปิด PowerShell ในโฟลเดอร์โปรเจกต์ (`d:\teng\web site\Ai Sport\Ai Sport`) แล้วรันคำสั่ง:
 
 ```bash
 # 1. Initialize git repository
@@ -34,7 +34,7 @@ git init
 git add .
 
 # 3. Commit ครั้งแรก
-git commit -m "Initial commit: CHAMPA BRAND website"
+git commit -m "Initial commit: Ai Sport website"
 
 # 4. เพิ่ม remote repository (แทน YOUR_USERNAME และ YOUR_REPO_NAME ด้วยค่าจริง)
 git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
@@ -47,11 +47,11 @@ git push -u origin main
 ## ตัวอย่างคำสั่ง (แก้ไขตาม repository ของคุณ)
 
 ```bash
-cd "d:\teng\website champa"
+cd "d:\teng\web site\Ai Sport\Ai Sport"
 git init
 git add .
-git commit -m "Initial commit: CHAMPA BRAND website"
-git remote add origin https://github.com/yourusername/champa-brand-website.git
+git commit -m "Initial commit: Ai Sport website"
+git remote add origin https://github.com/yourusername/ai-sport-website.git
 git branch -M main
 git push -u origin main
 ```

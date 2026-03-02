@@ -1,7 +1,7 @@
-# โครงสร้างโปรเจกต์ CHAMPA
+# โครงสร้างโปรเจกต์ Ai Sport
 
-## ฝั่ง Client (เว็บลูกค้า – Champa Brand)
-- **โฟลเดอร์:** `client/` (เดิมชื่อ "Champa brand")
+## ฝั่ง Client (เว็บลูกค้า – Ai Sport)
+- **โฟลเดอร์:** `client/`
 - **URL:** `/`, `/brand/`, `/brand/<path>`
 - **หน้าที่:** หน้าแรก, สินค้า, รีวิว, ติดต่อ, ล็อกอิน/สมัครสมาชิก
 - **ไฟล์หลัก:** `client/index.html`, `client/products.html`, `client/script.js`, `client/style.css`

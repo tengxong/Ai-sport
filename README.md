@@ -1,6 +1,6 @@
-# CHAMPA BRAND Website
+# Ai Sport Website
 
-เว็บไซต์สำหรับ CHAMPA BRAND - ระบบจัดการสินค้าและรีวิวลูกค้า
+เว็บไซต์สำหรับ Ai Sport - ระบบจัดการสินค้าและรีวิวลูกค้า
 
 ## Features
 
@@ -21,7 +21,7 @@
 1. **Clone repository**
 ```bash
 git clone <repository-url>
-cd "website champa"
+cd "Ai Sport"
 ```
 
 2. **Install dependencies**
@@ -59,7 +59,7 @@ python app.py
 ## Project Structure
 
 ```
-website champa/
+Ai Sport/
 ├── app.py                 # Flask application (main server)
 ├── pyhon.py              # Database functions & models
 ├── client/               # Frontend files (static HTML/CSS/JS)
@@ -113,4 +113,4 @@ Private project - All rights reserved
 
 ## Contact
 
-CHAMPA BRAND
+AI SPORT

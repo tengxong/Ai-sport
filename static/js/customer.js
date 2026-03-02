@@ -57,7 +57,7 @@ const CustomerPage = {
       const orders = Math.floor(Math.random() * 20) + 1;
       const totalSpent = (orders * Math.random() * 500).toFixed(2);
       const joinDate = new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-      const email = `${customer.username}@champa.com`;
+      const email = `${customer.username}@aisport.com`;
       const phoneDisplay = customer.phone || 'N/A';
 
       return `

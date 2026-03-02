@@ -59,7 +59,7 @@ const AdminPage = {
               </div>
               <div>
                 <div class="text-sm font-medium text-gray-900">${admin.username}</div>
-                <div class="text-sm text-gray-500">${admin.username}@champa.com</div>
+                <div class="text-sm text-gray-500">${admin.username}@aisport.com</div>
               </div>
             </div>
           </td>

@@ -1,7 +1,7 @@
 // ===== บังคับให้ล็อกอินก่อนดูหน้าสินค้า (products / products-review) =====
 (function checkLoginRequired() {
   if (document.body && document.body.classList.contains("products-page")) {
-    if (!localStorage.getItem("champa_token")) {
+    if (!localStorage.getItem("ai_sport_token")) {
       var next = (window.location.pathname || "") + (window.location.search || "") || "/brand/products.html";
       window.location.replace("/login?next=" + encodeURIComponent(next));
       return;
@@ -14,7 +14,7 @@
   function applyLogoutLink() {
     var link = document.querySelector(".header-login");
     if (!link) return;
-    if (localStorage.getItem("champa_token")) {
+    if (localStorage.getItem("ai_sport_token")) {
       link.textContent = "ອອກຈາກລະບົບ";
       link.href = "#";
       link.removeEventListener("click", handleLogoutClick);
@@ -27,16 +27,16 @@
   }
   function handleLogoutClick(e) {
     e.preventDefault();
-    var token = localStorage.getItem("champa_token");
+    var token = localStorage.getItem("ai_sport_token");
     if (token) {
       fetch((window.location.origin || "") + "/api/logout", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token }
       }).then(function () {
-        localStorage.removeItem("champa_token");
+        localStorage.removeItem("ai_sport_token");
         window.location.href = "/brand/";
       }).catch(function () {
-        localStorage.removeItem("champa_token");
+        localStorage.removeItem("ai_sport_token");
         window.location.href = "/brand/";
       });
     } else {
@@ -134,7 +134,7 @@ const yearEl = document.getElementById("year");
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
 // ===== Products Data =====
-const STORAGE_KEY = "champa_added_products";
+const STORAGE_KEY = "ai_sport_added_products";
 const defaultProducts = [
   { id: 1, title: "Jersey Pro Blue", price: "LAK 199.000", type: "football", badge: "ຂາຍດີ", desc: "ເສື້ອບານເຕະພິມລາຍໂທນນ້ຳເງິນ-ຂາວ ໃສ່ສະບາຍ ເໝາະກັບທີມແຂ່ງ", image: "images/products/1.jpg" },
   { id: 2, title: "Runner Light White", price: "LAK 179.000", type: "running", badge: "ມາໃໝ່", desc: "ເສື້ອວິ່ງຜ້າເບົາ ລະບາຍອາກາດດີ ເໝາະກັບງານວິ່ງແລະຊ້ອມ", image: "images/products/2.jpg" },
@@ -555,7 +555,7 @@ const copyTextBtn = document.getElementById("copyText");
 
 function openModal(id) {
   if (!modal) return;
-  var token = localStorage.getItem("champa_token");
+  var token = localStorage.getItem("ai_sport_token");
   if (!token) {
     var next = encodeURIComponent(window.location.pathname + window.location.search || "/brand/products.html");
     window.location.href = "/login?next=" + next;

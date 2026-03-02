@@ -1,4 +1,4 @@
-# วิธี Deploy CHAMPA BRAND ขึ้น Server
+# วิธี Deploy Ai Sport ขึ้น Server
 
 โปรเจกต์พร้อม deploy บน **Render** หรือ **Railway** (มี free tier)
 
@@ -11,19 +11,19 @@
 
 ### 1. สร้างบัญชีและเชื่อม GitHub
 - ไปที่ https://render.com → Sign up (ใช้ GitHub)
-- เชื่อม repo: **tengxong/champa_brand**
+- เชื่อม repo: **tengxong/Ai-sport**
 
 ### 2. สร้าง PostgreSQL
 - Dashboard → **New +** → **PostgreSQL**
-- ตั้งชื่อ เช่น `champa-db`
+- ตั้งชื่อ เช่น `ai-sport-db`
 - Region เลือกใกล้คุณ → **Create Database**
 - หลังสร้างเสร็จ ให้ copy **Internal Database URL** (หรือ External ถ้า deploy ที่อื่น)
 
 ### 3. Deploy Web Service (ไม่ใช่ Static Site)
 - **New +** → เลือก **Web Service** (ไม่ใช่ Static Site)
-- เลือก repo **champa_brand**
+- เลือก repo **Ai-sport**
 - ตั้งค่า:
-  - **Name**: `champa-brand`
+  - **Name**: `ai-sport`
   - **Runtime**: Python 3
   - **Build Command**: `pip install -r requirements.txt`
   - **Start Command**: `gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120`
@@ -38,7 +38,7 @@
 | `PYTHON_VERSION` | `3.11` (อย่าใช้ 3.14 เพราะ psycopg2-binary ยังไม่รองรับ) |
 
 **วิธี copy DATABASE_URL บน Render:**
-- ไปที่ PostgreSQL service (champa-db) → **Info** tab
+- ไปที่ PostgreSQL service (ai-sport-db) → **Info** tab
 - Copy ค่า **Internal Database URL** (ใช้ภายใน Render ได้เลย)
 - ไปที่ Web Service → **Environment** → Add Variable → Key: `DATABASE_URL`, Value: วาง URL ที่ copy มา
 
@@ -48,14 +48,14 @@
 ถ้าต้องการให้เพื่อน (หรือเครื่องอื่น) เชื่อมต่อ DB เดียวกับเรา:
 
 1. **เอา External Database URL**  
-   - ไปที่ **PostgreSQL** service บน Render (เช่น champa_db)  
+   - ไปที่ **PostgreSQL** service บน Render (เช่น ai_sport_db)  
    - แท็บ **Info** หรือกด **Connect** → เลือก **External Database URL**  
    - Copy ค่าที่ได้ (รูปแบบ `postgresql://USER:PASSWORD@HOST:PORT/DATABASE`)
 
 2. **ส่งให้เพื่อน**  
    - ส่ง **External Database URL** ให้เพื่อนทางแชทส่วนตัว (อย่าโพสต์ที่สาธารณะ เพราะมีรหัสผ่าน)  
    - เพื่อนตั้งในแอปของเขาเป็นตัวแปร **`DATABASE_URL`** = ค่าที่ส่งไป  
-   - โปรเจกต์ CHAMPA รองรับการเชื่อมต่อด้วย `DATABASE_URL` อยู่แล้ว (ใน `pyhon.py`)
+   - โปรเจกต์ Ai Sport รองรับการเชื่อมต่อด้วย `DATABASE_URL` อยู่แล้ว (ใน `pyhon.py`)
 
 3. **ถ้าเพื่อนใช้ค่าประกอบเอง** (host, user, password แยก):  
    ตั้ง environment ให้ครบ:  
@@ -68,7 +68,7 @@
 ### 5. Deploy
 - กด **Create Web Service**
 - Render จะ build และ deploy ให้
-- เมื่อเสร็จจะได้ URL เช่น `https://champa-brand.onrender.com`
+- เมื่อเสร็จจะได้ URL เช่น `https://ai-sport.onrender.com`
 
 ### 5.1 ป้องกันเว็บ Sleep (ให้เข้าได้ 24 ชั่วโมง)
 Render **Free tier** จะ sleep หลัง 15 นาทีไม่มีการใช้งาน — ครั้งแรกที่เข้าใหม่จะใช้เวลาโหลด 30-60 วินาที
@@ -241,7 +241,7 @@ print("DB initialized.")
 
 ### 1. สร้างโปรเจกต์
 - ไปที่ https://railway.app → Login with GitHub
-- **New Project** → **Deploy from GitHub repo** → เลือก **champa_brand**
+- **New Project** → **Deploy from GitHub repo** → เลือก **Ai-sport**
 
 ### 2. เพิ่ม PostgreSQL
 - ในโปรเจกต์ กด **+ New** → **Database** → **PostgreSQL**

@@ -66,12 +66,21 @@ def initialize_database():
 # เรียก init_db เมื่อ app start (lazy - จะเรียกเมื่อมี request แรก)
 @app.before_request
 def ensure_db_initialized():
+    if request.path == "/health":
+        return  # ไม่ต้อง init DB สำหรับ health check
     initialize_database()
 
 # Log เมื่อ app start
 logger.info("Flask app initialized")
 logger.info(f"Python version: {sys.version}")
 logger.info(f"Working directory: {os.getcwd()}")
+
+
+@app.get("/health")
+def health():
+    """Health check สำหรับ Render - ไม่เรียก DB เพื่อให้ deploy ผ่านแม้ DB ยังไม่พร้อม"""
+    return {"status": "ok"}, 200
+
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -110,7 +119,7 @@ PAGE_HTML = r"""
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Champa - เข้าสู่ระบบ</title>
+  <title>Ai Sport - เข้าสู่ระบบ</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
@@ -151,7 +160,7 @@ PAGE_HTML = r"""
   <div class="card card-auth">
     <div class="card-body p-4 p-md-5">
       <div class="mb-4 text-center">
-        <div class="brand">CHAMPA</div>
+        <div class="brand">AI SPORT</div>
         <h2 class="mt-2 mb-1">เข้าสู่ระบบ</h2>
         <p class="text-muted mb-0">กรุณาเข้าสู่ระบบเพื่อใช้งาน</p>
       </div>
@@ -204,7 +213,7 @@ PAGE_HTML = r"""
           if (isAdmin) {
             localStorage.setItem("token", data.token);  // Admin ใช้ key นี้
           } else {
-            localStorage.setItem("champa_token", data.token);  // Customer ใช้ key นี้
+            localStorage.setItem("ai_sport_token", data.token);  // Customer ใช้ key นี้
           }
         }
         
@@ -233,25 +242,25 @@ PAGE_HTML = r"""
 """
 
 
-# ========== ฝั่ง Client (Champa Brand - เว็บลูกค้า) ==========
+# ========== ฝั่ง Client (Ai Sport - เว็บลูกค้า) ==========
 CLIENT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "client")
 
 
 @app.get("/")
 def index():
-    """หน้าแรก -> ไปที่ Champa brand"""
+    """หน้าแรก -> ไปที่ Ai Sport"""
     return redirect("/brand/")
 
 
 @app.get("/brand/")
 def brand_index():
-    """หน้าแรก Champa brand"""
+    """หน้าแรก Ai Sport"""
     return send_from_directory(CLIENT_DIR, "index.html")
 
 
 @app.get("/brand/<path:path>")
 def brand_static(path):
-    """ไฟล์ static ของ Champa brand (css, js, images, หน้าอื่น)"""
+    """ไฟล์ static ของ Ai Sport (css, js, images, หน้าอื่น)"""
     return send_from_directory(CLIENT_DIR, path)
 
 
@@ -286,7 +295,7 @@ def setup_page():
     return render_template("setup.html")
 
 
-# ========== API สาธารณะ (สำหรับ Champa brand) ==========
+# ========== API สาธารณะ (สำหรับ Ai Sport) ==========
 
 
 @app.get("/api/products")
@@ -959,7 +968,7 @@ ADMIN_PAGE_HTML = r"""
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Champa - Admin</title>
+  <title>Ai Sport - Admin</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body { font-family: system-ui, sans-serif; background: #f1f5f9; }
@@ -971,7 +980,7 @@ ADMIN_PAGE_HTML = r"""
 <body>
   <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/">CHAMPA</a>
+      <a class="navbar-brand" href="/">AI SPORT</a>
       <span class="navbar-text me-3" id="admin-name"></span>
       <a class="btn btn-outline-secondary btn-sm" href="/">ออกจากระบบ / กลับหน้าแรก</a>
     </div>
@@ -1123,7 +1132,7 @@ DASHBOARD_HTML = r"""
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Champa - Dashboard</title>
+  <title>Ai Sport - Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body { font-family: system-ui, sans-serif; background: #f1f5f9; }
@@ -1138,7 +1147,7 @@ DASHBOARD_HTML = r"""
 <body>
   <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/">CHAMPA</a>
+      <a class="navbar-brand" href="/">AI SPORT</a>
       <span class="navbar-text me-3" id="user-info"></span>
       <a class="btn btn-outline-secondary btn-sm" href="/">ออกจากระบบ</a>
     </div>
