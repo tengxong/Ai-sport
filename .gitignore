@@ -48,9 +48,11 @@ instance/
 Thumbs.db
 desktop.ini
 
-# Uploads (keep folder structure but ignore files)
-static/uploads/**/*
-!static/uploads/.gitkeep
+# Uploads — เก็บในเครื่องเรา: ไม่ ignore โฟลเดอร์นี้ รูปที่แอดมินอัปโหลดจะเข้า git พร้อม deploy ไม่หายเมื่อ build ใหม่
+# static/uploads/**/*
+# !static/uploads/.gitkeep
+
+# หมายเหตุ: โฟลเดอร์ client/images (โลโก้ รูปสินค้าเริ่มต้น ฯลฯ) ต้องอยู่ใน git ถึงจะขึ้นบน server — อย่าใส่ client/images ใน ignore
 
 # Logs
 *.log

@@ -171,7 +171,7 @@ function renderProducts(list) {
     const card = document.createElement("div");
     card.className = "product";
     const thumbContent = p.image
-      ? `<img src="${p.image}" alt="${p.title}" class="thumb-img" onerror="this.style.display='none'" /><div class="badge">${p.badge || ""}</div>`
+      ? `<img src="${p.image}" alt="${p.title}" class="thumb-img" onerror="this.onerror=function(){this.style.display='none';}; this.src='/brand/images/logo/logo.svg';" /><div class="badge">${p.badge || ""}</div>`
       : `<div class="badge">${p.badge || ""}</div>`;
     card.innerHTML = `
       <div class="thumb">
@@ -249,7 +249,7 @@ function renderProducts(list) {
       if (imgSrc && imgSrc.indexOf("/") !== 0) {
         imgSrc = "/static/" + imgSrc;
       }
-      const imgTag = imgSrc ? `<img src="${imgSrc}" alt="${(p.title || p.name || "").replace(/"/g, "&quot;")}" onerror="this.style.display='none'" />` : "";
+      const imgTag = imgSrc ? `<img src="${imgSrc}" alt="${(p.title || p.name || "").replace(/"/g, "&quot;")}" onerror="this.onerror=function(){this.style.display='none';}; this.src='/brand/images/logo/logo.svg';" />` : "";
       const freeTag = (p.badge && (p.badge === "FREE" || p.badge === "ຟຣີ")) ? '<span class="product-card-free">FREE</span>' : "";
       const categoryLabel = getCategoryLabel(p.category || getProductCategory(p.type));
       const collarLabel = p.price_type || "";
@@ -276,7 +276,7 @@ function renderProducts(list) {
         thumbImgSrc = "/static/" + thumbImgSrc;
       }
       const thumbContent = thumbImgSrc
-        ? `<img src="${thumbImgSrc}" alt="${(p.title || p.name || "").replace(/"/g, "&quot;")}" class="thumb-img" onerror="this.style.display='none'" /><div class="badge">${p.badge || ""}</div>`
+        ? `<img src="${thumbImgSrc}" alt="${(p.title || p.name || "").replace(/"/g, "&quot;")}" class="thumb-img" onerror="this.onerror=function(){this.style.display='none';}; this.src='/brand/images/logo/logo.svg';" /><div class="badge">${p.badge || ""}</div>`
         : `<div class="badge">${p.badge || ""}</div>`;
       const categoryLabel = getCategoryLabel(p.category || getProductCategory(p.type));
       card.innerHTML = `
@@ -484,7 +484,7 @@ if (filterMatch && productsTabs.length) {
         imgSrc = product.image.indexOf("/") === 0 ? product.image : "/static/" + product.image;
       }
       const imgTag = imgSrc
-        ? '<div class="trust-review-thumb"><a href="products-review.html" class="trust-review-thumb-link" aria-label="ເບິ່ງລີວິວທັງໝົດ"><img src="' + imgSrc + '" alt="" onerror="this.parentElement.style.display=\'none\'" /></a></div>'
+        ? '<div class="trust-review-thumb"><a href="products-review.html" class="trust-review-thumb-link" aria-label="ເບິ່ງລີວິວທັງໝົດ"><img src="' + imgSrc + '" alt="" onerror="this.onerror=function(){this.parentElement.style.display=\'none\';}; this.src=\'/brand/images/logo/logo.svg\';" /></a></div>'
         : "";
       const productName = product && product.name ? (product.name + "").replace(/</g, "&lt;").replace(/>/g, "&gt;") : "";
       const productTitleHtml = productName ? '<div class="trust-review-product">' + productName + '</div>' : "";
@@ -526,7 +526,7 @@ function renderHomeProducts(products) {
     if (imgSrc && imgSrc.indexOf("/") !== 0) {
       imgSrc = "/static/" + imgSrc;
     }
-    const imgTag = imgSrc ? `<img src="${imgSrc}" alt="${(p.title || p.name || "").replace(/"/g, "&quot;")}" onerror="this.style.display='none'" />` : "";
+    const imgTag = imgSrc ? `<img src="${imgSrc}" alt="${(p.title || p.name || "").replace(/"/g, "&quot;")}" onerror="this.onerror=function(){this.style.display='none';}; this.src='/brand/images/logo/logo.svg';" />` : "";
     
     // แสดง category, description และขนาดสินค้า
     // แปลง "jersey" เป็น "JERSEY" (ตัวใหญ่) และแสดง category เป็นสีฟ้า
@@ -783,13 +783,25 @@ if (contactForm) {
 
     if (!name || !phone || !message) return;
 
-    const hasImage = formImages && formImages.files && formImages.files.length > 0;
-    const msg = hasImage
-      ? "ສົ່ງຂໍ້ຄວາມສຳເລັດ! ເລືອກຮູບແລ້ວ (ຕົວຢ່າງລະບົບ) — ກະລຸນາຕິດຕໍ່ຜ່ານ FB/TikTok/ເບີໄດ້ເລີຍ"
-      : "ສົ່ງຂໍ້ຄວາມສຳເລັດ! (ຕົວຢ່າງລະບົບ) — ກະລຸນາຕິດຕໍ່ຜ່ານ FB/TikTok/ເບີໄດ້ເລີຍ";
-    formResult.textContent = msg;
-    contactForm.reset();
-    resetContactImage();
+    const formResult = document.getElementById("formResult");
+    if (formResult) formResult.textContent = "ກຳລັງສົ່ງ...";
+    fetch((window.location.origin || "") + "/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: name, phone: phone, message: message })
+    })
+      .then(function (r) { return r.json().then(function (data) {
+        if (r.ok) {
+          if (formResult) formResult.textContent = "ສົ່ງຂໍ້ຄວາມສຳເລັດ! ທີມງານຈະຕິດຕໍ່ກັບທ່ານ.";
+          contactForm.reset();
+          resetContactImage();
+        } else {
+          if (formResult) formResult.textContent = data.error || "ເກີດຂໍ້ຜິດພາດ";
+        }
+      }); })
+      .catch(function () {
+        if (formResult) formResult.textContent = "ສົ່ງບໍ່ສຳເລັດ — ກະລຸນາລອງໃໝ່ ຫຼືຕິດຕໍ່ຜ່ານ FB/ເບີໂທ.";
+      });
   });
 }
 

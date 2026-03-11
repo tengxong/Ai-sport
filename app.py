@@ -33,6 +33,8 @@ from pyhon import (
     delete_customer,
     delete_admin,
     count_admins,
+    create_contact_message,
+    list_contact_messages,
     User,
 )
 
@@ -373,6 +375,22 @@ def api_logout():
     except Exception:
         pass
     return jsonify({"ok": True}), 200
+
+
+@app.post("/api/contact")
+def api_contact():
+    """รับข้อความจากฟอร์มติดต่อ (ไม่ต้อง login)"""
+    data = request.get_json(silent=True) or {}
+    name = (data.get("name") or "").strip()
+    phone = (data.get("phone") or "").strip()
+    message = (data.get("message") or "").strip()
+    if not name or not phone or not message:
+        return jsonify({"error": "ກະລຸນາໃສ່ຊື່ ເບີໂທ ແລະລາຍລະອຽດ"}), 400
+    try:
+        msg_id = create_contact_message(name=name, phone=phone, message=message)
+        return jsonify({"ok": True, "id": msg_id}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # ========== Setup: สร้างแอดมินคนแรก (ใช้กับ ApiDog / Postman ได้ ไม่ต้องส่ง token) ==========
@@ -919,6 +937,22 @@ def api_admin_customers_delete(customer_id):
         return jsonify({"error": str(e)}), 400
 
 
+@app.get("/api/admin/contact-messages")
+def api_admin_contact_messages():
+    """รายการข้อความจากฟอร์มติดต่อ (เฉพาะ admin)"""
+    user, err = _require_admin()
+    if err:
+        return err[0], err[1]
+    try:
+        messages = list_contact_messages(user)
+        for m in messages:
+            if m.get("created_at"):
+                m["created_at"] = m["created_at"].isoformat() if hasattr(m["created_at"], "isoformat") else str(m["created_at"])
+        return jsonify(messages)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
 @app.post("/api/admin/admins")
 def api_admin_admins_create():
     user, err = _require_admin()
@@ -1323,6 +1357,11 @@ def customer_page():
 @app.get("/product")
 def product_page():
     return render_template("product.html")
+
+
+@app.get("/contact-messages")
+def contact_messages_page():
+    return render_template("contact_messages.html")
 
 
 @app.errorhandler(405)
