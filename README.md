@@ -107,6 +107,11 @@ Ai Sport/
 - รองรับการอัปโหลดรูปภาพสินค้า
 - แสดงสินค้าในหน้า Client
 
+### รูปภาพไม่หายเมื่อ Build/Deploy และเก็บรูปไว้ที่เครื่อง
+- **เก็บรูปใน Repo**: โฟลเดอร์ `static/uploads/` (product, contact, profile, โลโก้) ถูกตั้งค่าให้ commit ได้ — ให้ `git add static/uploads/` แล้ว `git commit` และ `git push` รูปจะไปกับ deploy และมีสำเนาที่เครื่องคุณ
+- **ดาวน์โหลด backup**: ในหน้า Admin > Product Management มีปุ่ม **「ดาวน์โหลด backup รูป」** จะได้ไฟล์ zip ของโฟลเดอร์ uploads ทั้งหมด เอาไปแตกแล้วเก็บไว้ที่เครื่องหรือรวมเข้า repo ได้
+- บน hosting แบบ ephemeral (เช่น Render): รูปที่อัปโหลดหลัง deploy จะหายเมื่อ redeploy แนะนำให้หลังอัปโหลดรูปใหม่ใช้ปุ่ม backup ดาวน์โหลดมาแล้ว commit ลง repo
+
 ## License
 
 Private project - All rights reserved

@@ -41,10 +41,16 @@
           <h1 class="text-3xl font-bold text-gray-900 mb-2">Product Management</h1>
           <p class="text-gray-600">Manage your product inventory and pricing.</p>
         </div>
-        <button onclick="ProductPage.showAddModal()" class="bg-[#ff0099] text-white px-4 py-2 rounded-lg hover:bg-[#e60088] flex items-center space-x-2">
-          <span>+</span>
-          <span>Add Product</span>
-        </button>
+        <div class="flex items-center gap-3">
+          <a id="btn-backup-uploads" href="#" class="text-gray-600 hover:text-[#ff0099] border border-gray-300 hover:border-[#ff0099] px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors" title="ดาวน์โหลดรูปทั้งหมดเก็บไว้ที่เครื่อง">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            <span>ดาวน์โหลด backup รูป</span>
+          </a>
+          <button onclick="ProductPage.showAddModal()" class="bg-[#ff0099] text-white px-4 py-2 rounded-lg hover:bg-[#e60088] flex items-center space-x-2">
+            <span>+</span>
+            <span>Add Product</span>
+          </button>
+        </div>
       </div>
 
       <!-- Summary Cards -->
@@ -729,6 +735,15 @@
         const user = await API.get('/api/admin/me');
         if (user.profile_image) {
           updateProfileImage(user.profile_image);
+        }
+        const token = API.getToken();
+        const backupBtn = document.getElementById('btn-backup-uploads');
+        if (backupBtn && token) {
+          backupBtn.href = '/api/admin/backup-uploads?token=' + encodeURIComponent(token);
+        } else if (backupBtn) {
+          backupBtn.href = '#';
+          backupBtn.classList.add('opacity-50', 'cursor-not-allowed');
+          backupBtn.title = 'กรุณาเข้าสู่ระบบ';
         }
       } catch (error) {
         // ไม่ต้องแสดง error

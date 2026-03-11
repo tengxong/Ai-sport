@@ -1,6 +1,8 @@
-from flask import Flask, request, jsonify, render_template_string, render_template, send_from_directory, redirect
+from flask import Flask, request, jsonify, render_template_string, render_template, send_from_directory, redirect, send_file
 import os
 import sys
+import zipfile
+import io
 from werkzeug.utils import secure_filename
 
 # Logging สำหรับ debug
@@ -617,6 +619,31 @@ def api_admin_products_upload_image(product_id):
 def uploaded_product_file(filename):
     """Serve uploaded product images"""
     return send_from_directory(app.config['UPLOAD_FOLDER_PRODUCT'], filename)
+
+
+@app.get("/api/admin/backup-uploads")
+def api_admin_backup_uploads():
+    """ดาวน์โหลดโฟลเดอร์ static/uploads เป็นไฟล์ zip เก็บไว้ที่เครื่อง (Admin เท่านั้น)"""
+    user, err = _require_admin()
+    if err:
+        return err[0], err[1]
+    upload_root = os.path.join(app.root_path, "static", "uploads")
+    if not os.path.isdir(upload_root):
+        return jsonify({"error": "โฟลเดอร์ uploads ไม่พบ"}), 404
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        for dirpath, _dirnames, filenames in os.walk(upload_root):
+            for name in filenames:
+                path = os.path.join(dirpath, name)
+                arcname = os.path.relpath(path, os.path.dirname(upload_root))
+                zf.write(path, arcname)
+    buf.seek(0)
+    return send_file(
+        buf,
+        mimetype="application/zip",
+        as_attachment=True,
+        download_name="uploads-backup.zip",
+    )
 
 
 @app.get("/api/admin/products")

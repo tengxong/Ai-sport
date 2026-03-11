@@ -48,9 +48,19 @@ instance/
 Thumbs.db
 desktop.ini
 
-# Uploads (keep folder structure but ignore files)
+# Uploads: เก็บไฟล์ใน repo ได้เพื่อให้รูปไม่หายเมื่อ deploy และมีสำเนาที่เครื่องเรา
+# ถ้าต้องการไม่ commit รูป ให้ uncomment บรรทัดล่างและลบกลุ่ม !static/uploads/... ออก
+# static/uploads/**/*
 static/uploads/**/*
 !static/uploads/.gitkeep
+!static/uploads/product/
+!static/uploads/product/**
+!static/uploads/contact/
+!static/uploads/contact/**
+!static/uploads/profile/
+!static/uploads/profile/**
+# โลโก้ site (ชื่อไฟล์ขึ้นต้นด้วย site_logo)
+!static/uploads/site_logo*
 
 # Logs
 *.log
