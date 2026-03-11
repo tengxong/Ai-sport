@@ -33,20 +33,25 @@ from pyhon import (
     delete_customer,
     delete_admin,
     count_admins,
-    create_contact_message,
-    list_contact_messages,
+    create_contact_submission,
+    list_contact_submissions,
     User,
 )
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER_PROFILE'] = 'static/uploads/profile'
 app.config['UPLOAD_FOLDER_PRODUCT'] = 'static/uploads/product'
+app.config['UPLOAD_FOLDER_CONTACT'] = 'static/uploads/contact'
+app.config['UPLOAD_FOLDER_LOGO'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB max file size
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+ALLOWED_LOGO_EXTENSIONS = {'png', 'jpg', 'jpeg', 'svg'}
 
 # สร้างโฟลเดอร์สำหรับเก็บรูปภาพ
 os.makedirs(app.config['UPLOAD_FOLDER_PROFILE'], exist_ok=True)
 os.makedirs(app.config['UPLOAD_FOLDER_PRODUCT'], exist_ok=True)
+os.makedirs(app.config['UPLOAD_FOLDER_CONTACT'], exist_ok=True)
+os.makedirs(app.config['UPLOAD_FOLDER_LOGO'], exist_ok=True)
 
 # Flag เพื่อ init DB ครั้งเดียว
 _db_initialized = False
@@ -314,6 +319,48 @@ def api_products_public():
         return jsonify({"error": str(e)}), 500
 
 
+@app.post("/api/contact")
+def api_contact_submit():
+    """รับฟอร์มติดต่อจากลูกค้า (ชื่อ, เบอร์, ข้อความ, รูปแนบได้) ไม่ต้องล็อกอิน"""
+    try:
+        if request.content_type and "application/json" in request.content_type:
+            data = request.get_json(force=True)
+            name = (data.get("name") or "").strip()
+            phone = (data.get("phone") or "").strip() or None
+            message = (data.get("message") or "").strip()
+            if not name or not message:
+                return jsonify({"error": "กรุณากรอกชื่อและข้อความ"}), 400
+            images = data.get("images")
+            if isinstance(images, list):
+                import json
+                images = json.dumps(images)
+            else:
+                images = None
+            sub_id = create_contact_submission(name=name, message=message, phone=phone, images=images)
+            return jsonify({"ok": True, "id": sub_id}), 201
+        name = (request.form.get("name") or "").strip()
+        phone = (request.form.get("phone") or "").strip() or None
+        message = (request.form.get("message") or "").strip()
+        if not name or not message:
+            return jsonify({"error": "กรุณากรอกชื่อและข้อความ"}), 400
+        image_paths = []
+        upload_contact = app.config['UPLOAD_FOLDER_CONTACT']
+        files = request.files.getlist("files")
+        for f in files:
+            if f and f.filename and allowed_file(f.filename):
+                ext = f.filename.rsplit(".", 1)[-1].lower()
+                fn = secure_filename(f"contact_{int(__import__('time').time())}_{len(image_paths)}.{ext}")
+                f.save(os.path.join(upload_contact, fn))
+                image_paths.append(f"contact/{fn}")
+        import json as _json
+        images_json = _json.dumps(image_paths) if image_paths else None
+        sub_id = create_contact_submission(name=name, message=message, phone=phone, images=images_json)
+        return jsonify({"ok": True, "id": sub_id}), 201
+    except Exception as e:
+        logger.exception(e)
+        return jsonify({"error": str(e)}), 500
+
+
 @app.post("/api/register")
 def api_register():
     data = request.get_json(force=True)
@@ -375,22 +422,6 @@ def api_logout():
     except Exception:
         pass
     return jsonify({"ok": True}), 200
-
-
-@app.post("/api/contact")
-def api_contact():
-    """รับข้อความจากฟอร์มติดต่อ (ไม่ต้อง login)"""
-    data = request.get_json(silent=True) or {}
-    name = (data.get("name") or "").strip()
-    phone = (data.get("phone") or "").strip()
-    message = (data.get("message") or "").strip()
-    if not name or not phone or not message:
-        return jsonify({"error": "ກະລຸນາໃສ່ຊື່ ເບີໂທ ແລະລາຍລະອຽດ"}), 400
-    try:
-        msg_id = create_contact_message(name=name, phone=phone, message=message)
-        return jsonify({"ok": True, "id": msg_id}), 201
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 
 # ========== Setup: สร้างแอดมินคนแรก (ใช้กับ ApiDog / Postman ได้ ไม่ต้องส่ง token) ==========
@@ -937,22 +968,6 @@ def api_admin_customers_delete(customer_id):
         return jsonify({"error": str(e)}), 400
 
 
-@app.get("/api/admin/contact-messages")
-def api_admin_contact_messages():
-    """รายการข้อความจากฟอร์มติดต่อ (เฉพาะ admin)"""
-    user, err = _require_admin()
-    if err:
-        return err[0], err[1]
-    try:
-        messages = list_contact_messages(user)
-        for m in messages:
-            if m.get("created_at"):
-                m["created_at"] = m["created_at"].isoformat() if hasattr(m["created_at"], "isoformat") else str(m["created_at"])
-        return jsonify(messages)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
-
-
 @app.post("/api/admin/admins")
 def api_admin_admins_create():
     user, err = _require_admin()
@@ -993,6 +1008,50 @@ def api_admin_admins_delete(admin_id):
         return jsonify({"ok": True}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
+
+@app.get("/api/admin/contact-submissions")
+def api_admin_contact_submissions():
+    """รายการข้อความจากฟอร์มติดต่อ (admin เท่านั้น)"""
+    user, err = _require_admin()
+    if err:
+        return err[0], err[1]
+    try:
+        rows = list_contact_submissions()
+        for r in rows:
+            if r.get("created_at") and hasattr(r["created_at"], "isoformat"):
+                r["created_at"] = r["created_at"].isoformat()
+        return jsonify(rows)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+def _allowed_logo(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_LOGO_EXTENSIONS
+
+
+@app.post("/api/admin/upload-logo")
+def api_admin_upload_logo():
+    """อัปโหลดโลโก้ (SVG/PNG/JPG) แสดงในแอดมิน - รองรับ vector แรงดี"""
+    user, err = _require_admin()
+    if err:
+        return err[0], err[1]
+    if "file" not in request.files and "logo" not in request.files:
+        return jsonify({"error": "ไม่มีไฟล์"}), 400
+    f = request.files.get("file") or request.files.get("logo")
+    if not f or not f.filename:
+        return jsonify({"error": "ไม่มีไฟล์"}), 400
+    if not _allowed_logo(f.filename):
+        return jsonify({"error": "รองรับเฉพาะ .svg, .png, .jpg"}), 400
+    ext = f.filename.rsplit(".", 1)[-1].lower()
+    save_name = f"site_logo.{ext}"
+    upload_dir = app.config["UPLOAD_FOLDER_LOGO"]
+    path = os.path.join(upload_dir, save_name)
+    try:
+        f.save(path)
+        return jsonify({"ok": True, "url": f"/static/uploads/{save_name}"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # หน้า Admin (ส่ง token ผ่าน query ?token=xxx)
@@ -1361,6 +1420,7 @@ def product_page():
 
 @app.get("/contact-messages")
 def contact_messages_page():
+    """หน้าแอดมินดูข้อความที่ลูกค้าส่งมาจากฟอร์มติดต่อ"""
     return render_template("contact_messages.html")
 
 

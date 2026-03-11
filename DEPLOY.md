@@ -69,9 +69,6 @@
 - กด **Create Web Service**
 - Render จะ build และ deploy ให้
 - เมื่อเสร็จจะได้ URL เช่น `https://ai-sport.onrender.com`
-- **รูปภาพหลัง Deploy**
-  - **รูปในเว็บ (โลโก้, หน้าหลัก, รูปสินค้าเริ่มต้น)**: อยู่ที่ `client/images/` ต้อง **commit ใส่ git** ถึงจะไปกับ deploy — ถ้า build ใหม่แล้วรูปหาย ให้รัน `git add client/images` แล้ว `git commit` และ `git push`
-  - **รูปที่แอดมินอัปโหลด** (สินค้า/โปรไฟล์): เก็บใน `static/uploads/` **ในเครื่องเรา** — โฟลเดอร์นี้ไม่ถูก ignore แล้ว ดังนั้นหลังอัปโหลดให้รัน `git add static/uploads` แล้ว `git commit` และ `git push` รูปจะไปกับ deploy และไม่หายเมื่อ build ใหม่ (ถ้าอัปโหลดบน server โดยตรง ต้องดาวน์โหลดมาเก็บในเครื่องแล้วค่อย add/commit/push)
 
 ### 5.1 ป้องกันเว็บ Sleep (ให้เข้าได้ 24 ชั่วโมง)
 Render **Free tier** จะ sleep หลัง 15 นาทีไม่มีการใช้งาน — ครั้งแรกที่เข้าใหม่จะใช้เวลาโหลด 30-60 วินาที

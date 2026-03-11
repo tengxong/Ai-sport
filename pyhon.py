@@ -151,11 +151,12 @@ def init_db() -> None:
             )
             cur.execute(
                 """
-                CREATE TABLE IF NOT EXISTS contact_messages (
+                CREATE TABLE IF NOT EXISTS contact_submissions (
                     id SERIAL PRIMARY KEY,
                     name TEXT NOT NULL,
-                    phone TEXT NOT NULL,
+                    phone TEXT,
                     message TEXT NOT NULL,
+                    images TEXT,
                     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
                 );
                 """
@@ -167,6 +168,41 @@ def init_db() -> None:
 # ==========================
 
 SESSIONS: Dict[str, int] = {}  # token -> user_id (int)
+
+
+# ==========================
+#  Contact submissions (ฟอร์มติดต่อจากลูกค้า)
+# ==========================
+
+def create_contact_submission(name: str, message: str, phone: Optional[str] = None, images: Optional[str] = None) -> int:
+    """บันทึกข้อความจากฟอร์มติดต่อ ลูกค้า (ไม่ต้องล็อกอิน). images = JSON array of paths."""
+    import json
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO contact_submissions (name, phone, message, images, created_at)
+                VALUES (%s, %s, %s, %s, NOW())
+                RETURNING id
+                """,
+                (name.strip(), normalize_lao_phone(phone) if phone else None, message.strip(), images),
+            )
+            return cur.fetchone()[0]
+
+
+def list_contact_submissions() -> List[Dict]:
+    """ดึงรายการข้อความจากลูกค้าทั้งหมด (สำหรับ admin)."""
+    with get_connection() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(
+                """
+                SELECT id, name, phone, message, images, created_at
+                FROM contact_submissions
+                ORDER BY created_at DESC
+                """
+            )
+            rows = cur.fetchall()
+    return [dict(r) for r in rows]
 
 
 # ==========================
@@ -436,36 +472,6 @@ def logout(token: str) -> None:
         with conn.cursor() as cur:
             cur.execute("DELETE FROM user_sessions WHERE token = %s", (token,))
             conn.commit()
-
-
-# ==========================
-#  Contact Messages (ฟอร์มติดต่อจากลูกค้า)
-# ==========================
-
-
-def create_contact_message(name: str, phone: str, message: str) -> int:
-    """บันทึกข้อความจากฟอร์มติดต่อ (ไม่ต้อง login) คืน id"""
-    with get_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute(
-                "INSERT INTO contact_messages (name, phone, message) VALUES (%s, %s, %s) RETURNING id",
-                (name.strip(), phone.strip(), message.strip()),
-            )
-            row = cur.fetchone()
-            conn.commit()
-            return row[0]
-
-
-def list_contact_messages(current_user: User) -> List[Dict]:
-    """ดึงรายการข้อความจากฟอร์มติดต่อ (เฉพาะ admin) เรียงจากใหม่ไปเก่า"""
-    _require_admin(current_user)
-    with get_connection() as conn:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute(
-                "SELECT id, name, phone, message, created_at FROM contact_messages ORDER BY created_at DESC"
-            )
-            rows = cur.fetchall()
-    return [dict(r) for r in rows]
 
 
 # ==========================
