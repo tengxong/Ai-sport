@@ -153,6 +153,25 @@
     </div>
   </div>
 
+  <!-- View Customer Modal -->
+  <div id="view-customer-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 py-8">
+    <div class="relative mx-auto p-6 max-w-md w-full shadow-xl rounded-xl bg-white">
+      <div class="flex items-center justify-between mb-4 pb-3 border-b">
+        <h3 class="text-xl font-bold text-gray-900">ລາຍລະອຽດລູກຄ້າ</h3>
+        <button type="button" onclick="CustomerPage.closeViewModal()" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100">✕</button>
+      </div>
+      <div id="view-customer-content" class="space-y-4">
+        <!-- ใส่ข้อมูลโดย JS -->
+      </div>
+      <div class="mt-6 flex justify-end gap-2">
+        <button type="button" onclick="CustomerPage.closeViewModal()" class="px-4 py-2 border rounded-lg hover:bg-gray-50">ປິດ</button>
+        <button type="button" id="view-customer-message-btn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2">
+          <span>💬</span> ສົ່ງຂໍ້ຄວາມ
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Upload Profile Modal -->
   <div id="upload-profile-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">

@@ -10,7 +10,21 @@
     .nav-item.active { color: #ffffff; border-bottom: 2px solid #ffffff; }
     .nav-item { color: rgba(255, 255, 255, 0.7); }
     .nav-item:hover { color: #ffffff; }
-    .sidebar-item.active { background: #eff6ff; color: #1d4ed8; font-weight: 600; }
+    .sidebar-item.active { background: rgba(255,0,153,0.08); color: #ff0099; font-weight: 600; }
+    /* Modal Add/Edit Product - สวยขึ้น */
+    .modal-product-backdrop { background: rgba(15,23,42,0.5); backdrop-filter: blur(8px); }
+    .modal-product-box { max-width: 28rem; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border: 1px solid rgba(0,0,0,0.06); }
+    .modal-product-header { background: linear-gradient(135deg, #ff0099 0%, #e60088 100%); color: #fff; margin: -1.25rem -1.25rem 1.25rem -1.25rem; padding: 1rem 1.25rem; border-radius: 1rem 1rem 0 0; }
+    .modal-product-upload { aspect-ratio: 1; width: 10rem; max-width: 100%; margin: 0 auto 1rem; border: 2px dashed rgba(255,0,153,0.4); border-radius: 1rem; background: rgba(255,0,153,0.04); transition: border-color .2s, background .2s; }
+    .modal-product-upload:hover { border-color: #ff0099; background: rgba(255,0,153,0.08); }
+    .modal-product-upload svg { color: rgba(255,0,153,0.6); }
+    .modal-product-input { border-radius: 0.75rem; border: 1px solid #e5e7eb; padding: 0.625rem 1rem; transition: border-color .2s, box-shadow .2s; }
+    .modal-product-input:focus { outline: none; border-color: #ff0099; box-shadow: 0 0 0 3px rgba(255,0,153,0.15); }
+    .modal-product-label { color: #374151; font-weight: 600; font-size: 0.875rem; margin-bottom: 0.375rem; }
+    .modal-product-btn-cancel { border-radius: 0.75rem; padding: 0.5rem 1rem; background: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; transition: background .2s; }
+    .modal-product-btn-cancel:hover { background: #e5e7eb; }
+    .modal-product-btn-add { border-radius: 0.75rem; padding: 0.5rem 1.25rem; background: linear-gradient(135deg, #ff0099, #e60088); color: #fff; font-weight: 600; box-shadow: 0 4px 14px rgba(255,0,153,0.4); transition: transform .15s, box-shadow .15s; }
+    .modal-product-btn-add:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,0,153,0.45); }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -139,97 +153,100 @@
   </div>
 
   <!-- Add Product Modal -->
-  <div id="add-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 py-8">
-    <div class="relative top-0 mx-auto p-5 border w-96 max-h-[90vh] overflow-y-auto shadow-lg rounded-md bg-white">
-      <div class="mt-3">
-        <h3 class="text-lg font-semibold mb-4">Add Product</h3>
-        
-        <!-- Product Image -->
-        <div class="mb-4 text-center">
-          <img id="add-product-image-preview" src="" alt="Preview" class="hidden w-24 h-24 rounded-lg mx-auto mb-2 object-cover border border-gray-200">
-          <div id="add-product-image-placeholder" class="w-24 h-24 rounded-lg mx-auto mb-2 bg-gray-200 flex items-center justify-center">
-            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-            </svg>
-          </div>
-          <input type="file" id="add-product-image-input" accept="image/png,image/jpeg,image/jpg,image/gif,image/webp" 
-                 onchange="ProductPage.previewAddImage(event)" 
-                 class="w-full px-4 py-2 border rounded-lg text-sm">
-        </div>
-        
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">ຊື່ສິນຄ້າ</label>
-          <input type="text" id="add-name" class="w-full px-4 py-2 border rounded-lg">
-        </div>
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">ອະທິບາຍສິນຄ້າ</label>
-          <textarea id="add-description" rows="2" class="w-full px-4 py-2 border rounded-lg" placeholder="อธิบายเนื้อหาสินค้า..."></textarea>
-        </div>
-        <!-- ປະເພດສິນຄ້າ + ປະເພດຄໍ (แสดงทั้งคู่) -->
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">ປະເພດສິນຄ້າ</label>
-          <select id="add-category" class="w-full px-4 py-2 border rounded-lg">
-            <option value="">-- ປະເພດສິນຄ້າ --</option>
-            <option value="company">ເສື້ອບານເຕະ</option>
-            <option value="agency">ເສື້ອຕີບານ</option>
-            <option value="event">ເສື້ອແລ່ນ</option>
-            <option value="sport">ເສື້ອ E-Sport</option>
-            <option value="jersey">ເສື້ອ ທີມງານ</option>
-          </select>
-        </div>
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">ປະເພດຄໍ</label>
-          <select id="add-price-type" class="w-full px-4 py-2 border rounded-lg">
-            <option value="">ທັງໝົດ</option>
-            <option value="ຄໍມົນ">ຄໍມົນ</option>
-            <option value="ຄໍວີ-ວີໄຂວ">ຄໍວີ-ວີໄຂວ</option>
-            <option value="ຄໍ5ລ່ຽນ">ຄໍ5ລ່ຽນ</option>
-            <option value="ຄໍໂປໂລ">ຄໍໂປໂລ</option>
-          </select>
-        </div>
-        <div class="flex justify-end space-x-2">
-          <button onclick="ProductPage.closeAddModal()" class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">Cancel</button>
-          <button onclick="ProductPage.add()" class="px-4 py-2 bg-[#ff0099] text-white rounded-lg hover:bg-[#e60088]">Add</button>
-        </div>
+  <div id="add-modal" class="hidden fixed inset-0 overflow-y-auto h-full w-full z-50 py-8 modal-product-backdrop">
+    <div class="relative top-0 mx-auto p-5 modal-product-box bg-white max-h-[90vh] overflow-y-auto">
+      <div class="modal-product-header flex items-center justify-between">
+        <h3 class="text-xl font-bold">Add Product</h3>
+        <button type="button" onclick="ProductPage.closeAddModal()" class="text-white/90 hover:text-white p-1 rounded-lg hover:bg-white/20 transition" aria-label="ປິດ">✕</button>
+      </div>
+      
+      <!-- Product Image -->
+      <div class="mb-5 text-center">
+        <img id="add-product-image-preview" src="" alt="Preview" class="hidden w-40 h-40 rounded-xl mx-auto mb-3 object-cover border-2 border-gray-100 shadow-inner">
+        <label id="add-product-image-placeholder" for="add-product-image-input" class="modal-product-upload flex flex-col items-center justify-center cursor-pointer">
+          <svg class="w-10 h-10 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          <span class="text-xs font-medium text-gray-500">ຄລິກເພີ່ມຮູບ</span>
+        </label>
+        <input type="file" id="add-product-image-input" accept="image/png,image/jpeg,image/jpg,image/gif,image/webp" 
+               onchange="ProductPage.previewAddImage(event)" 
+               class="hidden">
+      </div>
+      
+      <div class="mb-4">
+        <label for="add-name" class="modal-product-label block">ຊື່ສິນຄ້າ</label>
+        <input type="text" id="add-name" class="modal-product-input w-full" placeholder="ຕົວຢ່າງ: ເສື້ອທີມບານເຕະ">
+      </div>
+      <div class="mb-4">
+        <label for="add-description" class="modal-product-label block">ອະທິບາຍສິນຄ້າ</label>
+        <textarea id="add-description" rows="3" class="modal-product-input w-full resize-none" placeholder="ອະທິບາຍສິນຄ້າ..."></textarea>
+      </div>
+      <div class="mb-4">
+        <label for="add-category" class="modal-product-label block">ປະເພດສິນຄ້າ</label>
+        <select id="add-category" class="modal-product-input w-full bg-white">
+          <option value="">-- ປະເພດສິນຄ້າ --</option>
+          <option value="company">ເສື້ອບານເຕະ</option>
+          <option value="agency">ເສື້ອຕີບານ</option>
+          <option value="event">ເສື້ອແລ່ນ</option>
+          <option value="sport">ເສື້ອ E-Sport</option>
+          <option value="jersey">ເສື້ອ ທີມງານ</option>
+        </select>
+      </div>
+      <div class="mb-5">
+        <label for="add-price-type" class="modal-product-label block">ປະເພດຄໍ</label>
+        <select id="add-price-type" class="modal-product-input w-full bg-white">
+          <option value="">ທັງໝົດ</option>
+          <option value="ຄໍມົນ">ຄໍມົນ</option>
+          <option value="ຄໍວີ-ວີໄຂວ">ຄໍວີ-ວີໄຂວ</option>
+          <option value="ຄໍ5ລ່ຽນ">ຄໍ5ລ່ຽນ</option>
+          <option value="ຄໍໂປໂລ">ຄໍໂປໂລ</option>
+        </select>
+      </div>
+      <div class="flex justify-end gap-3 pt-1">
+        <button type="button" onclick="ProductPage.closeAddModal()" class="modal-product-btn-cancel">Cancel</button>
+        <button type="button" onclick="ProductPage.add()" class="modal-product-btn-add">Add</button>
       </div>
     </div>
   </div>
 
   <!-- Edit Modal -->
-  <div id="edit-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-      <div class="mt-3">
-        <h3 class="text-lg font-semibold mb-4">Edit Product</h3>
-        <input type="hidden" id="edit-product-id">
-        
-        <!-- Product Image -->
-        <div class="mb-4 text-center">
-          <img id="edit-product-image-preview" src="" alt="Product Image" class="hidden w-24 h-24 rounded-lg mx-auto mb-2 object-cover border border-gray-200">
-          <div id="edit-product-image-placeholder" class="w-24 h-24 rounded-lg mx-auto mb-2 bg-gray-200 flex items-center justify-center">
-            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-            </svg>
-          </div>
-          <input type="file" id="edit-product-image-input" accept="image/png,image/jpeg,image/jpg,image/gif,image/webp" 
-                 onchange="ProductPage.previewEditImage(event)" 
-                 class="w-full px-4 py-2 border rounded-lg text-sm">
-          <button onclick="ProductPage.uploadProductImageFromEdit()" class="mt-2 w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm">
-            Upload Image
-          </button>
-        </div>
-        
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">ຊື່ສິນຄ້າ</label>
-          <input type="text" id="edit-product-name" class="w-full px-4 py-2 border rounded-lg">
-        </div>
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">ອະທິບາຍສິນຄ້າ</label>
-          <textarea id="edit-product-description" rows="3" class="w-full px-4 py-2 border rounded-lg" placeholder="อธิบายเนื้อหาสินค้า..."></textarea>
-        </div>
-        <div class="flex justify-end space-x-2">
-          <button onclick="ProductPage.closeEdit()" class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">Cancel</button>
-          <button onclick="ProductPage.saveEdit()" class="px-4 py-2 bg-[#ff0099] text-white rounded-lg hover:bg-[#e60088]">Save</button>
-        </div>
+  <div id="edit-modal" class="hidden fixed inset-0 overflow-y-auto h-full w-full z-50 py-8 modal-product-backdrop">
+    <div class="relative top-0 mx-auto p-5 modal-product-box bg-white max-h-[90vh] overflow-y-auto">
+      <div class="modal-product-header flex items-center justify-between">
+        <h3 class="text-xl font-bold">Edit Product</h3>
+        <button type="button" onclick="ProductPage.closeEdit()" class="text-white/90 hover:text-white p-1 rounded-lg hover:bg-white/20 transition" aria-label="ປິດ">✕</button>
+      </div>
+      <input type="hidden" id="edit-product-id">
+      
+      <!-- Product Image -->
+      <div class="mb-5 text-center">
+        <img id="edit-product-image-preview" src="" alt="Product Image" class="hidden w-40 h-40 rounded-xl mx-auto mb-3 object-cover border-2 border-gray-100 shadow-inner">
+        <label id="edit-product-image-placeholder" for="edit-product-image-input" class="modal-product-upload flex flex-col items-center justify-center cursor-pointer">
+          <svg class="w-10 h-10 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          <span class="text-xs font-medium text-gray-500">ຄລິກເພີ່ມຮູບ</span>
+        </label>
+        <input type="file" id="edit-product-image-input" accept="image/png,image/jpeg,image/jpg,image/gif,image/webp" 
+               onchange="ProductPage.previewEditImage(event)" 
+               class="hidden">
+        <button type="button" onclick="ProductPage.uploadProductImageFromEdit()" class="mt-3 w-full py-2 rounded-xl text-sm font-medium bg-emerald-500 text-white hover:bg-emerald-600 transition shadow">
+          Upload Image
+        </button>
+      </div>
+      
+      <div class="mb-4">
+        <label for="edit-product-name" class="modal-product-label block">ຊື່ສິນຄ້າ</label>
+        <input type="text" id="edit-product-name" class="modal-product-input w-full">
+      </div>
+      <div class="mb-4">
+        <label for="edit-product-description" class="modal-product-label block">ອະທິບາຍສິນຄ້າ</label>
+        <textarea id="edit-product-description" rows="3" class="modal-product-input w-full resize-none" placeholder="ອະທິບາຍສິນຄ້າ..."></textarea>
+      </div>
+      <div class="flex justify-end gap-3 pt-1">
+        <button type="button" onclick="ProductPage.closeEdit()" class="modal-product-btn-cancel">Cancel</button>
+        <button type="button" onclick="ProductPage.saveEdit()" class="modal-product-btn-add">Save</button>
       </div>
     </div>
   </div>

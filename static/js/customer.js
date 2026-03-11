@@ -6,6 +6,7 @@ const CustomerPage = {
   itemsPerPage: 10,
   searchTerm: '',
   filterStatus: 'all',
+  currentViewCustomerId: null,
 
   async load() {
     try {
@@ -136,11 +137,65 @@ const CustomerPage = {
   },
 
   view(id) {
-    Notification.info(`View customer #${id}`);
+    const customer = this.allCustomers.find(c => c.id === id);
+    if (!customer) {
+      Notification.warning('ບໍ່ພົບຂໍ້ມູນລູກຄ້າ');
+      return;
+    }
+    this.currentViewCustomerId = id;
+    const firstLetter = customer.username.charAt(0).toUpperCase();
+    const colors = ['bg-[#ff0099]', 'bg-green-500', 'bg-purple-500', 'bg-pink-500', 'bg-yellow-500', 'bg-red-500'];
+    const avatarColor = colors[customer.id % colors.length];
+    const email = `${customer.username}@aisport.com`;
+    const phoneDisplay = customer.phone || '-';
+    const status = customer.role === 'customer' ? 'Active' : 'Inactive';
+    const statusClass = status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800';
+
+    const content = document.getElementById('view-customer-content');
+    content.innerHTML = `
+      <div class="flex items-center gap-4">
+        <div class="w-16 h-16 rounded-full ${avatarColor} flex items-center justify-center text-white text-2xl font-bold">${firstLetter}</div>
+        <div>
+          <div class="text-lg font-semibold text-gray-900">${customer.username}</div>
+          <span class="px-2 py-0.5 text-xs font-semibold rounded-full ${statusClass}">${status}</span>
+        </div>
+      </div>
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between py-2 border-b"><span class="text-gray-500">ອີເມວ</span><span class="text-gray-900">${email}</span></div>
+        <div class="flex justify-between py-2 border-b"><span class="text-gray-500">ເບີໂທ</span><span class="text-gray-900">${phoneDisplay}</span></div>
+        <div class="flex justify-between py-2 border-b"><span class="text-gray-500">ID</span><span class="text-gray-900">#${customer.id}</span></div>
+      </div>
+    `;
+
+    const msgBtn = document.getElementById('view-customer-message-btn');
+    if (msgBtn) {
+      msgBtn.onclick = () => this.message(id);
+    }
+
+    document.getElementById('view-customer-modal').classList.remove('hidden');
+  },
+
+  closeViewModal() {
+    document.getElementById('view-customer-modal').classList.add('hidden');
+    this.currentViewCustomerId = null;
   },
 
   message(id) {
-    Notification.info(`Message customer #${id}`);
+    const customer = this.allCustomers.find(c => c.id === id);
+    if (!customer) {
+      Notification.warning('ບໍ່ພົບຂໍ້ມູນລູກຄ້າ');
+      return;
+    }
+    const phone = (customer.phone || '').replace(/\D/g, '');
+    if (phone) {
+      const waNumber = phone.startsWith('856') ? phone : '856' + phone.replace(/^0/, '');
+      window.open('https://wa.me/' + waNumber, '_blank', 'noopener');
+      Notification.success('ເປີດ WhatsApp ໃໝ່');
+    } else {
+      const email = customer.username + '@aisport.com';
+      window.location.href = 'mailto:' + encodeURIComponent(email);
+      Notification.success('ເປີດແອັບອີເມວ');
+    }
   },
 
   async delete(id) {
