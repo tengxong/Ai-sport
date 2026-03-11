@@ -8,23 +8,23 @@
   <style>
     .auth-page { min-height: 100vh; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
     .auth-box { width: 100%; max-width: 420px; background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(45, 48, 145, 0.12); overflow: hidden; border: 1px solid var(--line); }
-    .auth-header { background: #2d3091; color: #fff; padding: 24px; text-align: center; }
+    .auth-header { background: #ff0099; color: #fff; padding: 24px; text-align: center; }
     .auth-header h1 { margin: 0; font-size: 1.5rem; font-weight: 800; }
     .auth-header p { margin: 8px 0 0; opacity: 0.9; font-size: 0.9rem; }
     .auth-tabs { display: flex; border-bottom: 1px solid var(--line); }
     .auth-tab { flex: 1; padding: 14px; text-align: center; font-weight: 600; cursor: pointer; background: #f8f9fa; color: var(--muted); border: none; font-family: inherit; font-size: 15px; }
-    .auth-tab.active { background: #fff; color: #2d3091; border-bottom: 2px solid #2d3091; }
+    .auth-tab.active { background: #fff; color: #ff0099; border-bottom: 2px solid #ff0099; }
     .auth-tab:hover:not(.active) { background: #f0f0f0; }
     .auth-body { padding: 24px; }
     .auth-form { display: none; }
     .auth-form.active { display: block; }
     .auth-form label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; color: var(--text); }
     .auth-form input { width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 15px; font-family: inherit; margin-bottom: 16px; box-sizing: border-box; }
-    .auth-form input:focus { outline: none; border-color: #2d3091; box-shadow: 0 0 0 2px rgba(45, 48, 145, 0.2); }
-    .auth-form button[type="submit"] { width: 100%; padding: 14px; background: #2d3091; color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; }
-    .auth-form button[type="submit"]:hover { background: #3d4199; }
+    .auth-form input:focus { outline: none; border-color: #ff0099; box-shadow: 0 0 0 2px rgba(255, 0, 153, 0.2); }
+    .auth-form button[type="submit"] { width: 100%; padding: 14px; background: #ff0099; color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .auth-form button[type="submit"]:hover { background: #e60088; }
     .auth-form .hint { font-size: 12px; color: var(--muted); margin-top: -8px; margin-bottom: 12px; }
-    .auth-back { display: inline-block; margin-top: 20px; color: #2d3091; font-weight: 600; text-decoration: none; }
+    .auth-back { display: inline-block; margin-top: 20px; color: #ff0099; font-weight: 600; text-decoration: none; }
     .auth-back:hover { text-decoration: underline; }
     .auth-msg { padding: 10px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; display: none; }
     .auth-msg.show { display: block; }
@@ -33,7 +33,7 @@
     .password-wrapper { position: relative; margin-bottom: 16px; }
     .password-wrapper input { padding-right: 45px; }
     .password-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 4px; color: var(--muted); font-size: 18px; line-height: 1; }
-    .password-toggle:hover { color: #2d3091; }
+    .password-toggle:hover { color: #ff0099; }
     .password-toggle:focus { outline: none; }
   </style>
 </head>

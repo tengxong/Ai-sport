@@ -94,8 +94,8 @@ const ProductPage = {
       const productImage = productImageUrl(product.image);
       const imageDisplay = productImage 
         ? `<img src="${productImage}" alt="${product.name}" class="w-10 h-10 rounded-lg object-cover mr-3 border border-gray-200">`
-        : `<div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center mr-3">
-            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        : `<div class="w-10 h-10 rounded-lg bg-[#ff0099]/10 flex items-center justify-center mr-3">
+            <svg class="w-5 h-5 text-[#ff0099]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
             </svg>
           </div>`;
@@ -115,7 +115,7 @@ const ProductPage = {
           <td class="px-6 py-4 text-sm text-gray-600 max-w-xs" title="${(product.description || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')}">${descShort}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm">
             <div class="flex items-center space-x-2">
-              <button onclick="ProductPage.view(${product.id})" class="text-blue-600 hover:text-blue-900" title="View">👁️</button>
+              <button onclick="ProductPage.view(${product.id})" class="text-[#ff0099] hover:text-[#cc0077]" title="View">👁️</button>
               <button onclick="ProductPage.edit(${product.id})" class="text-indigo-600 hover:text-indigo-900" title="Edit">✏️</button>
               <button onclick="ProductPage.delete(${product.id})" class="text-red-600 hover:text-red-900" title="Delete">🗑️</button>
               <button class="text-gray-600 hover:text-gray-900" title="More">⋮</button>

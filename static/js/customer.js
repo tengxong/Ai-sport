@@ -45,7 +45,7 @@ const CustomerPage = {
 
     tbody.innerHTML = pageData.map((customer, idx) => {
       const firstLetter = customer.username.charAt(0).toUpperCase();
-      const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500', 'bg-yellow-500', 'bg-red-500'];
+      const colors = ['bg-[#ff0099]', 'bg-green-500', 'bg-purple-500', 'bg-pink-500', 'bg-yellow-500', 'bg-red-500'];
       const colorIndex = customer.id % colors.length;
       const avatarColor = colors[colorIndex];
       const status = customer.role === 'customer' ? 'Active' : 'Inactive';
@@ -85,7 +85,7 @@ const CustomerPage = {
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${joinDate}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm">
             <div class="flex items-center space-x-2">
-              <button onclick="CustomerPage.view(${customer.id})" class="text-blue-600 hover:text-blue-900" title="View">👁️</button>
+              <button onclick="CustomerPage.view(${customer.id})" class="text-[#ff0099] hover:text-[#cc0077]" title="View">👁️</button>
               <button onclick="CustomerPage.message(${customer.id})" class="text-green-600 hover:text-green-900" title="Message">✉️</button>
               <button onclick="CustomerPage.delete(${customer.id})" class="text-red-600 hover:text-red-900" title="Delete">🗑️</button>
               <button class="text-gray-600 hover:text-gray-900" title="More">⋮</button>

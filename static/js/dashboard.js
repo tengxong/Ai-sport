@@ -206,7 +206,7 @@ function loadRecentActivities(activities) {
     return;
   }
   
-  const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500', 'bg-yellow-500'];
+  const colors = ['bg-[#ff0099]', 'bg-green-500', 'bg-purple-500', 'bg-pink-500', 'bg-yellow-500'];
   const formatTimeAgo = (dateStr) => {
     const date = new Date(dateStr);
     const now = new Date();

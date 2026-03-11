@@ -142,14 +142,14 @@ PAGE_HTML = r"""
       letter-spacing: .08em;
       font-size: 0.85rem;
       text-transform: uppercase;
-      color: #6366f1;
+      color: #ff0099;
     }
     .btn-primary {
-      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      background: linear-gradient(135deg, #ff0099, #e60088);
       border: none;
     }
     .btn-primary:hover {
-      background: linear-gradient(135deg, #4f46e5, #4338ca);
+      background: linear-gradient(135deg, #e60088, #cc0077);
     }
     .status {
       font-size: 0.85rem;
@@ -972,7 +972,7 @@ ADMIN_PAGE_HTML = r"""
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body { font-family: system-ui, sans-serif; background: #f1f5f9; }
-    .navbar-brand { font-weight: 700; color: #6366f1; }
+    .navbar-brand { font-weight: 700; color: #ff0099; }
     .card { border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
     .table th { background: #f8fafc; }
   </style>
@@ -1136,9 +1136,9 @@ DASHBOARD_HTML = r"""
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body { font-family: system-ui, sans-serif; background: #f1f5f9; }
-    .navbar-brand { font-weight: 700; color: #6366f1; }
+    .navbar-brand { font-weight: 700; color: #ff0099; }
     .nav-tabs .nav-link { color: #64748b; }
-    .nav-tabs .nav-link.active { color: #6366f1; font-weight: 600; }
+    .nav-tabs .nav-link.active { color: #ff0099; font-weight: 600; }
     .card { border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); margin-bottom: 20px; }
     .table th { background: #f8fafc; }
     .btn-sm { padding: 0.25rem 0.5rem; }

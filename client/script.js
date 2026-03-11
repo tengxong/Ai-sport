@@ -244,8 +244,12 @@ function renderProducts(list) {
   listToShow.forEach((p) => {
     const card = document.createElement("div");
     if (isWorkGrid) {
-      const imgSrc = p.image || "";
-      const imgTag = imgSrc ? `<img src="${imgSrc}" alt="${p.title}" onerror="this.style.display='none'" />` : "";
+      // รูปจาก API เป็น path แบบ uploads/product/xxx ต้องเติม /static/
+      let imgSrc = p.image || "";
+      if (imgSrc && imgSrc.indexOf("/") !== 0) {
+        imgSrc = "/static/" + imgSrc;
+      }
+      const imgTag = imgSrc ? `<img src="${imgSrc}" alt="${(p.title || p.name || "").replace(/"/g, "&quot;")}" onerror="this.style.display='none'" />` : "";
       const freeTag = (p.badge && (p.badge === "FREE" || p.badge === "ຟຣີ")) ? '<span class="product-card-free">FREE</span>' : "";
       const categoryLabel = getCategoryLabel(p.category || getProductCategory(p.type));
       const collarLabel = p.price_type || "";
@@ -256,7 +260,7 @@ function renderProducts(list) {
           <div class="product-card-img product-card-img-single">${imgTag}${freeTag}</div>
         </div>
         <div class="product-card-body">
-          <div class="product-card-brand">${p.title}</div>
+          <div class="product-card-brand">${p.title || p.name || ""}</div>
           ${categoryLabel ? '<div class="product-card-category muted">' + categoryLabel + '</div>' : ''}
           ${collarLabel ? '<div class="product-card-collar muted">' + collarLabel + '</div>' : ''}
           ${descShort ? '<div class="product-card-desc muted">' + descShort + '</div>' : ''}
@@ -267,13 +271,17 @@ function renderProducts(list) {
       `;
     } else {
       card.className = "product";
-      const thumbContent = p.image
-        ? `<img src="${p.image}" alt="${p.title}" class="thumb-img" onerror="this.style.display='none'" /><div class="badge">${p.badge || ""}</div>`
+      let thumbImgSrc = p.image || "";
+      if (thumbImgSrc && thumbImgSrc.indexOf("/") !== 0) {
+        thumbImgSrc = "/static/" + thumbImgSrc;
+      }
+      const thumbContent = thumbImgSrc
+        ? `<img src="${thumbImgSrc}" alt="${(p.title || p.name || "").replace(/"/g, "&quot;")}" class="thumb-img" onerror="this.style.display='none'" /><div class="badge">${p.badge || ""}</div>`
         : `<div class="badge">${p.badge || ""}</div>`;
       const categoryLabel = getCategoryLabel(p.category || getProductCategory(p.type));
       card.innerHTML = `
         <div class="thumb">${thumbContent}</div>
-        <div class="product-title">${p.title}</div>
+        <div class="product-title">${p.title || p.name || ""}</div>
         <div class="muted">${categoryLabel || typeLabel(p.type)}</div>
         <div class="product-actions">
           <button class="btn small primary" data-buy="${p.id}">ສັ່ງຊື້</button>
@@ -513,8 +521,12 @@ function renderHomeProducts(products) {
   products.forEach((p) => {
     const card = document.createElement("div");
     card.className = "product-card-work";
-    const imgSrc = p.image || "";
-    const imgTag = imgSrc ? `<img src="${imgSrc}" alt="${p.title}" onerror="this.style.display='none'" />` : "";
+    // รูปจาก API เก็บเป็น path แบบ uploads/product/xxx ต้องเติม /static/ เพื่อให้โหลดได้
+    let imgSrc = p.image || "";
+    if (imgSrc && imgSrc.indexOf("/") !== 0) {
+      imgSrc = "/static/" + imgSrc;
+    }
+    const imgTag = imgSrc ? `<img src="${imgSrc}" alt="${(p.title || p.name || "").replace(/"/g, "&quot;")}" onerror="this.style.display='none'" />` : "";
     
     // แสดง category, description และขนาดสินค้า
     // แปลง "jersey" เป็น "JERSEY" (ตัวใหญ่) และแสดง category เป็นสีฟ้า
@@ -523,7 +535,7 @@ function renderHomeProducts(products) {
       displayCategory = "JERSEY";
     }
     const categoryHtml = displayCategory ? `<div class="product-card-category">${displayCategory}</div>` : "";
-    const descHtml = p.desc ? `<div class="product-card-desc">${p.desc}</div>` : "";
+    const descHtml = (p.desc || p.description) ? `<div class="product-card-desc">${p.desc || p.description}</div>` : "";
     // แสดงขนาดสินค้า (XS S M L XL 2XL 3XL)
     const sizesHtml = `<div class="product-card-sizes">XS S M L XL 2XL 3XL</div>`;
     
@@ -532,6 +544,7 @@ function renderHomeProducts(products) {
         <div class="product-card-img product-card-img-single">${imgTag}</div>
       </div>
       <div class="product-card-body">
+        <div class="product-card-brand">${(p.title || p.name || "").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
         ${categoryHtml}
         ${descHtml}
         ${sizesHtml}

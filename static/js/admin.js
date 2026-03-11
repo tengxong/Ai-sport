@@ -40,11 +40,11 @@ const AdminPage = {
 
     tbody.innerHTML = this.filteredAdmins.map(admin => {
       const firstLetter = admin.username.charAt(0).toUpperCase();
-      const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500'];
+      const colors = ['bg-[#ff0099]', 'bg-green-500', 'bg-purple-500', 'bg-pink-500'];
       const colorIndex = admin.id % colors.length;
       const avatarColor = colors[colorIndex];
       const role = admin.role === 'admin' ? 'Super Admin' : admin.role;
-      const roleColor = role === 'Super Admin' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800';
+      const roleColor = role === 'Super Admin' ? 'bg-purple-100 text-purple-800' : 'bg-[#ff0099]/20 text-[#ff0099]';
       const status = 'Active';
       const statusClass = 'bg-green-100 text-green-800';
       const lastLogin = this.getLastLogin(admin.id);
@@ -77,7 +77,7 @@ const AdminPage = {
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${lastLogin}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm">
             <div class="flex items-center space-x-2">
-              <button onclick="AdminPage.edit(${admin.id})" class="text-blue-600 hover:text-blue-900" title="Edit">✏️</button>
+              <button onclick="AdminPage.edit(${admin.id})" class="text-[#ff0099] hover:text-[#cc0077]" title="Edit">✏️</button>
               <button onclick="AdminPage.message(${admin.id})" class="text-green-600 hover:text-green-900" title="Message">✉️</button>
               <button onclick="AdminPage.delete(${admin.id})" class="text-red-600 hover:text-red-900" title="Delete">🗑️</button>
               <button class="text-gray-600 hover:text-gray-900" title="More">⋮</button>
