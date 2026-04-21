@@ -251,15 +251,20 @@
           }
           reviewGrid.innerHTML = "";
           function esc(s) { return (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+          function toImageUrl(path) {
+            if (!path) return "";
+            if (/^https?:\/\//i.test(path)) return path;
+            return path.indexOf("/") === 0 ? path : "/static/" + path;
+          }
           reviews.forEach(function (review) {
             const product = products.find(function (p) { return p.id === review.product_id; });
             const productName = esc(product ? product.name : "Product #" + review.product_id);
             const stars = "⭐".repeat(Math.min(5, Math.max(0, review.rating || 0)));
             let imgSrc = "";
             if (review.images && review.images.length > 0) {
-              imgSrc = review.images[0].indexOf("/") === 0 ? review.images[0] : "/static/" + review.images[0];
+              imgSrc = toImageUrl(review.images[0]);
             } else if (product && product.image) {
-              imgSrc = product.image.indexOf("/") === 0 ? product.image : "/static/" + product.image;
+              imgSrc = toImageUrl(product.image);
             }
             const imgTag = imgSrc ? '<img src="' + imgSrc.replace(/"/g, "&quot;") + '" alt="" onerror="this.style.display=\'none\'" />' : "";
             const contact = [];

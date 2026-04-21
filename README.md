@@ -112,6 +112,18 @@ Ai Sport/
 - **ดาวน์โหลด backup**: ในหน้า Admin > Product Management มีปุ่ม **「ดาวน์โหลด backup รูป」** จะได้ไฟล์ zip ของโฟลเดอร์ uploads ทั้งหมด เอาไปแตกแล้วเก็บไว้ที่เครื่องหรือรวมเข้า repo ได้
 - บน hosting แบบ ephemeral (เช่น Render): รูปที่อัปโหลดหลัง deploy จะหายเมื่อ redeploy แนะนำให้หลังอัปโหลดรูปใหม่ใช้ปุ่ม backup ดาวน์โหลดมาแล้ว commit ลง repo
 
+### ใช้ S3 เก็บรูป (รองรับแล้ว)
+- ระบบรองรับการอัปโหลดรูป `product/profile/contact` ไป S3 โดยตั้ง ENV ใน `.env` หรือ Render:
+  - `S3_ENABLED=true`
+  - `S3_BUCKET_NAME=<bucket-name>`
+  - `AWS_REGION=<region>`
+  - `AWS_ACCESS_KEY_ID=<key>`
+  - `AWS_SECRET_ACCESS_KEY=<secret>`
+  - (optional) `S3_ENDPOINT_URL` สำหรับ S3-compatible provider
+  - (optional) `S3_PUBLIC_BASE_URL` ถ้ามี CDN/custom domain
+  - (optional) `S3_OBJECT_PREFIX=uploads`
+- ถ้าไม่ตั้งค่า S3 ระบบจะ fallback กลับไปเก็บไฟล์ใน `static/uploads` แบบเดิมอัตโนมัติ
+
 ## License
 
 Private project - All rights reserved

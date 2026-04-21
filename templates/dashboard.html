@@ -270,7 +270,9 @@
         if (avatar) {
           // แปลง path ให้ถูกต้อง: ถ้าเป็น relative path ให้เพิ่ม /static/ นำหน้า
           let imageUrl;
-          if (imagePath.startsWith('/static/')) {
+          if (/^https?:\/\//i.test(imagePath)) {
+            imageUrl = imagePath;
+          } else if (imagePath.startsWith('/static/')) {
             imageUrl = imagePath;
           } else if (imagePath.startsWith('/')) {
             imageUrl = imagePath;

@@ -1,4 +1,10 @@
 // Product management page
+function toImageUrl(path) {
+  if (!path) return null;
+  if (/^https?:\/\//i.test(path)) return path;
+  return path.startsWith('/') ? path : '/static/' + path;
+}
+
 const ProductPage = {
   allProducts: [],
   filteredProducts: [],
@@ -85,13 +91,9 @@ const ProductPage = {
       return str.length <= len ? str : str.slice(0, len) + '…';
     };
 
-    const productImageUrl = (path) => {
-      if (!path) return null;
-      return path.startsWith('/') ? path : '/static/' + path;
-    };
     tbody.innerHTML = products.map(product => {
       const status = this.getStatus(product.stock);
-      const productImage = productImageUrl(product.image);
+      const productImage = toImageUrl(product.image);
       const imageDisplay = productImage 
         ? `<img src="${productImage}" alt="${product.name}" class="w-10 h-10 rounded-lg object-cover mr-3 border border-gray-200">`
         : `<div class="w-10 h-10 rounded-lg bg-[#ff0099]/10 flex items-center justify-center mr-3">
@@ -182,7 +184,7 @@ const ProductPage = {
     document.getElementById('view-product-description').textContent = product.description || '- ไม่มีคำอธิบาย -';
     const imgEl = document.getElementById('view-product-image');
     if (product.image) {
-      const imgUrl = product.image.startsWith('/static/') ? product.image : '/static/' + product.image;
+      const imgUrl = toImageUrl(product.image);
       imgEl.style.backgroundImage = `url(${imgUrl})`;
       imgEl.classList.remove('bg-gray-100');
     } else {
@@ -339,7 +341,7 @@ const ProductPage = {
     const editImagePreview = document.getElementById('edit-product-image-preview');
     const editImagePlaceholder = document.getElementById('edit-product-image-placeholder');
     if (product.image) {
-      const imgUrl = product.image.startsWith('/') ? product.image : '/static/' + product.image;
+      const imgUrl = toImageUrl(product.image);
       editImagePreview.src = imgUrl;
       editImagePreview.classList.remove('hidden');
       editImagePlaceholder.classList.add('hidden');
@@ -375,7 +377,7 @@ const ProductPage = {
       const editImagePreview = document.getElementById('edit-product-image-preview');
       const editImagePlaceholder = document.getElementById('edit-product-image-placeholder');
       if (result) {
-        const imgUrl = result.startsWith('/') ? result : '/static/' + result;
+        const imgUrl = toImageUrl(result);
         editImagePreview.src = imgUrl;
         editImagePreview.classList.remove('hidden');
         editImagePlaceholder.classList.add('hidden');

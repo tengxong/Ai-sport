@@ -3,6 +3,7 @@ import os
 import sys
 import zipfile
 import io
+from urllib.parse import urlparse
 from werkzeug.utils import secure_filename
 
 # Logging สำหรับ debug
@@ -83,6 +84,115 @@ def ensure_db_initialized():
 logger.info("Flask app initialized")
 logger.info(f"Python version: {sys.version}")
 logger.info(f"Working directory: {os.getcwd()}")
+
+# ========== Optional S3 storage (for uploads) ==========
+S3_ENABLED = os.environ.get("S3_ENABLED", "false").strip().lower() in {"1", "true", "yes", "on"}
+S3_BUCKET_NAME = (os.environ.get("S3_BUCKET_NAME") or "").strip()
+AWS_REGION = (os.environ.get("AWS_REGION") or "").strip()
+S3_ENDPOINT_URL = (os.environ.get("S3_ENDPOINT_URL") or "").strip() or None
+S3_PUBLIC_BASE_URL = (os.environ.get("S3_PUBLIC_BASE_URL") or "").strip().rstrip("/")
+S3_OBJECT_PREFIX = (os.environ.get("S3_OBJECT_PREFIX") or "uploads").strip().strip("/")
+_s3_client = None
+
+
+def _is_http_url(value):
+    return bool(value) and (value.startswith("http://") or value.startswith("https://"))
+
+
+def _s3_is_ready():
+    return S3_ENABLED and bool(S3_BUCKET_NAME)
+
+
+def _get_s3_client():
+    global _s3_client
+    if _s3_client is not None:
+        return _s3_client
+    import boto3
+    kwargs = {}
+    if AWS_REGION:
+        kwargs["region_name"] = AWS_REGION
+    if S3_ENDPOINT_URL:
+        kwargs["endpoint_url"] = S3_ENDPOINT_URL
+    _s3_client = boto3.client("s3", **kwargs)
+    return _s3_client
+
+
+def _build_s3_key(subfolder, filename):
+    folder = (subfolder or "").strip("/ ")
+    parts = [S3_OBJECT_PREFIX]
+    if folder:
+        parts.append(folder)
+    parts.append(filename)
+    return "/".join(parts)
+
+
+def _build_s3_public_url(key):
+    if S3_PUBLIC_BASE_URL:
+        return f"{S3_PUBLIC_BASE_URL}/{key}"
+    if S3_ENDPOINT_URL:
+        return f"{S3_ENDPOINT_URL.rstrip('/')}/{S3_BUCKET_NAME}/{key}"
+    if AWS_REGION:
+        return f"https://{S3_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{key}"
+    return f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/{key}"
+
+
+def _save_upload_file(file_obj, subfolder, filename):
+    """Save upload to S3 when enabled, otherwise local filesystem."""
+    if _s3_is_ready():
+        key = _build_s3_key(subfolder, filename)
+        extra = {}
+        if getattr(file_obj, "content_type", None):
+            extra["ContentType"] = file_obj.content_type
+        if extra:
+            _get_s3_client().upload_fileobj(file_obj.stream, S3_BUCKET_NAME, key, ExtraArgs=extra)
+        else:
+            _get_s3_client().upload_fileobj(file_obj.stream, S3_BUCKET_NAME, key)
+        return _build_s3_public_url(key)
+    folder_path = app.config["UPLOAD_FOLDER_LOGO"] if not subfolder else os.path.join("static", "uploads", subfolder)
+    os.makedirs(folder_path, exist_ok=True)
+    save_path = os.path.join(folder_path, filename)
+    file_obj.save(save_path)
+    if subfolder:
+        return f"uploads/{subfolder}/{filename}"
+    return f"/static/uploads/{filename}"
+
+
+def _extract_s3_key_from_url(url):
+    if not _is_http_url(url):
+        return None
+    parsed = urlparse(url)
+    path = parsed.path.lstrip("/")
+    if S3_PUBLIC_BASE_URL and url.startswith(S3_PUBLIC_BASE_URL + "/"):
+        key = url[len(S3_PUBLIC_BASE_URL) + 1 :]
+        return key.strip("/")
+    if S3_ENDPOINT_URL and url.startswith(S3_ENDPOINT_URL.rstrip("/") + "/"):
+        bucket_prefix = f"{S3_BUCKET_NAME}/"
+        if path.startswith(bucket_prefix):
+            return path[len(bucket_prefix):]
+    if path.startswith(f"{S3_OBJECT_PREFIX}/"):
+        return path
+    return None
+
+
+def _delete_stored_file(stored_value):
+    if not stored_value:
+        return
+    try:
+        if _is_http_url(stored_value) and _s3_is_ready():
+            key = _extract_s3_key_from_url(stored_value)
+            if key:
+                _get_s3_client().delete_object(Bucket=S3_BUCKET_NAME, Key=key)
+            return
+        if stored_value.startswith("uploads/"):
+            local_path = os.path.join("static", stored_value)
+        elif stored_value.startswith("/static/uploads/"):
+            local_path = os.path.join("static", stored_value.replace("/static/", "", 1))
+        else:
+            return
+        if os.path.exists(local_path):
+            os.remove(local_path)
+    except Exception:
+        pass
 
 
 @app.get("/health")
@@ -346,14 +456,12 @@ def api_contact_submit():
         if not name or not message:
             return jsonify({"error": "กรุณากรอกชื่อและข้อความ"}), 400
         image_paths = []
-        upload_contact = app.config['UPLOAD_FOLDER_CONTACT']
         files = request.files.getlist("files")
         for f in files:
             if f and f.filename and allowed_file(f.filename):
                 ext = f.filename.rsplit(".", 1)[-1].lower()
                 fn = secure_filename(f"contact_{int(__import__('time').time())}_{len(image_paths)}.{ext}")
-                f.save(os.path.join(upload_contact, fn))
-                image_paths.append(f"contact/{fn}")
+                image_paths.append(_save_upload_file(f, "contact", fn))
         import json as _json
         images_json = _json.dumps(image_paths) if image_paths else None
         sub_id = create_contact_submission(name=name, message=message, phone=phone, images=images_json)
@@ -512,10 +620,8 @@ def api_admin_upload_profile():
         filename = secure_filename(file.filename)
         ext = filename.rsplit('.', 1)[1].lower()
         new_filename = f"{user.id}_{int(time.time())}.{ext}"
-        filepath = os.path.join(app.config['UPLOAD_FOLDER_PROFILE'], new_filename)
-        
-        # บันทึกไฟล์
-        file.save(filepath)
+        # บันทึกไฟล์ (S3 หรือ local)
+        saved_path = _save_upload_file(file, "profile", new_filename)
         
         # บันทึก path ลง database
         from pyhon import get_connection
@@ -525,15 +631,10 @@ def api_admin_upload_profile():
                 cur.execute("SELECT profile_image FROM users WHERE id = %s", (user.id,))
                 old_image = cur.fetchone()
                 if old_image and old_image[0]:
-                    old_path = os.path.join('static', old_image[0])
-                    if os.path.exists(old_path):
-                        try:
-                            os.remove(old_path)
-                        except:
-                            pass
+                    _delete_stored_file(old_image[0])
                 
                 # บันทึก path ใหม่ (เก็บเป็น relative path จาก static)
-                relative_path = f"uploads/profile/{new_filename}"
+                relative_path = saved_path
                 cur.execute("UPDATE users SET profile_image = %s WHERE id = %s", (relative_path, user.id))
                 conn.commit()
         
@@ -581,10 +682,8 @@ def api_admin_products_upload_image(product_id):
         filename = secure_filename(file.filename)
         ext = filename.rsplit('.', 1)[1].lower()
         new_filename = f"product_{product_id}_{int(time.time())}.{ext}"
-        filepath = os.path.join(app.config['UPLOAD_FOLDER_PRODUCT'], new_filename)
-        
-        # บันทึกไฟล์
-        file.save(filepath)
+        # บันทึกไฟล์ (S3 หรือ local)
+        saved_path = _save_upload_file(file, "product", new_filename)
         
         # บันทึก path ลง database
         from pyhon import get_connection
@@ -594,15 +693,10 @@ def api_admin_products_upload_image(product_id):
                 cur.execute("SELECT image FROM products WHERE id = %s", (product_id,))
                 old_image = cur.fetchone()
                 if old_image and old_image[0]:
-                    old_path = os.path.join('static', old_image[0])
-                    if os.path.exists(old_path):
-                        try:
-                            os.remove(old_path)
-                        except:
-                            pass
+                    _delete_stored_file(old_image[0])
                 
                 # บันทึก path ใหม่
-                relative_path = f"uploads/product/{new_filename}"
+                relative_path = saved_path
                 cur.execute("UPDATE products SET image = %s WHERE id = %s", (relative_path, product_id))
                 conn.commit()
         

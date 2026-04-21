@@ -147,6 +147,12 @@ const defaultProducts = [
 // สินค้าจาก API (เมื่อเปิดผ่าน Flask จะโหลดจาก /api/products)
 let apiProducts = [];
 
+function toImageUrl(path) {
+  if (!path) return "";
+  if (/^https?:\/\//i.test(path)) return path;
+  return path.indexOf("/") === 0 ? path : "/static/" + path;
+}
+
 let addedProducts = [];
 try {
   const saved = localStorage.getItem(STORAGE_KEY);
@@ -244,11 +250,7 @@ function renderProducts(list) {
   listToShow.forEach((p) => {
     const card = document.createElement("div");
     if (isWorkGrid) {
-      // รูปจาก API เป็น path แบบ uploads/product/xxx ต้องเติม /static/
-      let imgSrc = p.image || "";
-      if (imgSrc && imgSrc.indexOf("/") !== 0) {
-        imgSrc = "/static/" + imgSrc;
-      }
+      const imgSrc = toImageUrl(p.image);
       const imgTag = imgSrc ? `<img src="${imgSrc}" alt="${(p.title || p.name || "").replace(/"/g, "&quot;")}" onerror="this.style.display='none'" />` : "";
       const freeTag = (p.badge && (p.badge === "FREE" || p.badge === "ຟຣີ")) ? '<span class="product-card-free">FREE</span>' : "";
       const categoryLabel = getCategoryLabel(p.category || getProductCategory(p.type));
@@ -271,10 +273,7 @@ function renderProducts(list) {
       `;
     } else {
       card.className = "product";
-      let thumbImgSrc = p.image || "";
-      if (thumbImgSrc && thumbImgSrc.indexOf("/") !== 0) {
-        thumbImgSrc = "/static/" + thumbImgSrc;
-      }
+      const thumbImgSrc = toImageUrl(p.image);
       const thumbContent = thumbImgSrc
         ? `<img src="${thumbImgSrc}" alt="${(p.title || p.name || "").replace(/"/g, "&quot;")}" class="thumb-img" onerror="this.style.display='none'" /><div class="badge">${p.badge || ""}</div>`
         : `<div class="badge">${p.badge || ""}</div>`;
@@ -425,7 +424,7 @@ if (filterMatch && productsTabs.length) {
     if (r.ok) {
       const data = await r.json();
       apiProducts = data.map(function (p) {
-        var imgUrl = p.image ? (p.image.indexOf("/") === 0 ? p.image : "/static/" + p.image) : "";
+        var imgUrl = toImageUrl(p.image);
         return {
           id: p.id,
           title: p.name,
@@ -479,9 +478,9 @@ if (filterMatch && productsTabs.length) {
       // รูป: ใช้จาก review.images ก่อน ถ้าไม่มีให้ดึงจาก product ที่ product_id ตรงกับ review
       let imgSrc = "";
       if (rev.images && rev.images.length > 0) {
-        imgSrc = rev.images[0].indexOf("/") === 0 ? rev.images[0] : "/static/" + rev.images[0];
+        imgSrc = toImageUrl(rev.images[0]);
       } else if (product && product.image) {
-        imgSrc = product.image.indexOf("/") === 0 ? product.image : "/static/" + product.image;
+        imgSrc = toImageUrl(product.image);
       }
       const imgTag = imgSrc
         ? '<div class="trust-review-thumb"><a href="products-review.html" class="trust-review-thumb-link" aria-label="ເບິ່ງລີວິວທັງໝົດ"><img src="' + imgSrc + '" alt="" onerror="this.parentElement.style.display=\'none\'" /></a></div>'
@@ -521,11 +520,7 @@ function renderHomeProducts(products) {
   products.forEach((p) => {
     const card = document.createElement("div");
     card.className = "product-card-work";
-    // รูปจาก API เก็บเป็น path แบบ uploads/product/xxx ต้องเติม /static/ เพื่อให้โหลดได้
-    let imgSrc = p.image || "";
-    if (imgSrc && imgSrc.indexOf("/") !== 0) {
-      imgSrc = "/static/" + imgSrc;
-    }
+    const imgSrc = toImageUrl(p.image);
     const imgTag = imgSrc ? `<img src="${imgSrc}" alt="${(p.title || p.name || "").replace(/"/g, "&quot;")}" onerror="this.style.display='none'" />` : "";
     
     // แสดง category, description และขนาดสินค้า
@@ -585,7 +580,7 @@ function openModal(id) {
   if (mPreview) {
     if (p.image) {
       mPreview.style.background = "none";
-      mPreview.style.backgroundImage = `url(${p.image})`;
+      mPreview.style.backgroundImage = `url(${toImageUrl(p.image)})`;
       mPreview.style.backgroundSize = "cover";
       mPreview.style.backgroundPosition = "center";
     } else {
